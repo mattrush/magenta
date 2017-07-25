@@ -195,6 +195,7 @@ PciCapMsi::PciCapMsi(const PcieDevice& dev, uint16_t base, uint8_t id)
     addr_     = PciReg32(static_cast<uint16_t>(base_ + kAddrOffset));
 
     uint16_t ctrl = cfg->Read(ctrl_reg());
+    TRACEF("MSI ctrl: %#04x\n", ctrl);
     has_pvm_      = PCIE_CAP_MSI_CTRL_PVM_SUPPORTED(ctrl);
     is_64_bit_    = PCIE_CAP_MSI_CTRL_64BIT_SUPPORTED(ctrl);
     msi_size_     = (has_pvm_ ? (is_64_bit_ ? k64BitPvmSize : k32BitPvmSize)
