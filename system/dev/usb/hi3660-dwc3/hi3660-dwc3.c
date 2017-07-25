@@ -10,6 +10,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
 
 #include "dwc3-regs.h"
 #include "hi3660-regs.h"
@@ -41,6 +42,14 @@ typedef struct {
     pdev_mmio_buffer_t pmctrl;
 } hi3360_dwc3_t;
 
+
+void dwc3_wait_bits(volatile uint32_t* ptr, uint32_t bits, uint32_t expected) {
+    uint32_t value = readl(ptr);
+    while ((value & bits) != expected) {
+        usleep(1000);
+        value = readl(ptr);
+    }
+}
 
 static mx_status_t hi3360_dwc3_init(hi3360_dwc3_t* dwc) {
 
@@ -189,6 +198,12 @@ printf("GCTL: %08X\n", temp);
     writel(temp, usb3otg + GCTL);
 printf("GCTL: %08X\n", temp);
 
+
+printf("soft reset\n");
+    temp = readl(usb3otg + DCTL);
+    temp |= DCTL_CSFTRST;
+    writel(temp, usb3otg + DCTL);
+    dwc3_wait_bits(usb3otg + DCTL, DCTL_CSFTRST, 0);
 
 //    printf("usbotg:\n");
 //    hexdump(dwc->usb3otg.vaddr, 256);
