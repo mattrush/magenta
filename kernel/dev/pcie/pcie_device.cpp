@@ -28,7 +28,7 @@
 
 #include <mxalloc/new.h>
 
-#define LOCAL_TRACE 0
+#define LOCAL_TRACE 1
 
 namespace {  // anon namespace.  Externals do not need to know about PcieDeviceImpl
 class PcieDeviceImpl : public PcieDevice {
@@ -411,6 +411,7 @@ status_t PcieDevice::ProbeBarLocked(uint bar_id) {
     /* Determine the type of BAR this is.  Make sure that it is one of the types we understand */
     pcie_bar_info_t& bar_info  = bars_[bar_id];
     uint32_t bar_val           = cfg_->Read(PciConfig::kBAR(bar_id));
+    TRACEF("bar %u val %08x\n", bar_id, bar_val);
     bar_info.is_mmio           = (bar_val & PCI_BAR_IO_TYPE_MASK) == PCI_BAR_IO_TYPE_MMIO;
     bar_info.is_64bit          = bar_info.is_mmio &&
                                  ((bar_val & PCI_BAR_MMIO_TYPE_MASK) == PCI_BAR_MMIO_TYPE_64BIT);
@@ -446,6 +447,7 @@ status_t PcieDevice::ProbeBarLocked(uint bar_id) {
      * disabled.
      */
     uint16_t backup = cfg_->Read(PciConfig::kCommand);
+    TRACEF("Cmd backup %04x\n", backup);
     if (bar_info.is_mmio)
         cfg_->Write(PciConfig::kCommand, static_cast<uint16_t>(backup & ~PCI_COMMAND_MEM_EN));
     else

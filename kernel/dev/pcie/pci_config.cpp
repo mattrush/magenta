@@ -90,6 +90,7 @@ uint16_t PciPioConfig::Read(const PciReg16 addr) const {
 uint32_t PciPioConfig::Read(const PciReg32 addr) const {
     uint32_t val;
     PCI::PioCfgRead(static_cast<uint32_t>(base_ + addr.offset()), &val, 32u);
+    TRACEF("%#x -> %08x\n", static_cast<uint32_t>(base_ + addr.offset()), val);
     return val;
 }
 void PciPioConfig::Write(const PciReg8 addr, uint8_t val) const {
